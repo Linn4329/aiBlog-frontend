@@ -2,10 +2,8 @@ import { lazy, Suspense } from 'react'
 import { createBrowserRouter } from 'react-router-dom'
 import { Layout } from '@/components/layout/Layout'
 import { ProtectedRoute } from '@/components/layout/ProtectedRoute'
-<<<<<<< Updated upstream
-=======
-import { PageLoader } from '@/components/ui/PageLoader'
->>>>>>> Stashed changes
+import { PageLoader } from '@/components/ui/PageLoader'  
+
 
 // 懒加载页面组件
 const Home = lazy(() => import('@/pages/Home'))
@@ -18,21 +16,6 @@ const EditProfile = lazy(() => import('@/pages/Profile/EditProfile'))
 const Login = lazy(() => import('@/pages/Auth/Login'))
 const Register = lazy(() => import('@/pages/Auth/Register'))
 
-<<<<<<< Updated upstream
-// 加载占位组件
-function PageLoader() {
-  return (
-    <div className="flex items-center justify-center h-full">
-      <div className="text-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600 mx-auto" />
-        <p className="mt-4 text-gray-600 dark:text-gray-400">加载中...</p>
-      </div>
-    </div>
-  )
-}
-
-=======
->>>>>>> Stashed changes
 // 路由配置
 export const router = createBrowserRouter([
   {
