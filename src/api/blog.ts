@@ -6,13 +6,12 @@ import type {
   UpdatePostRequest,
   CreateTagRequest,
   PostQueryParams,
-  PaginatedResponse,
 } from '@/types'
 
 export const blogAPI = {
   // 获取文章列表
   getPosts: (params?: PostQueryParams) =>
-    api.get<PaginatedResponse<Post>>('/blog/posts/', { params }),
+    api.get<{ message: string; posts: Post[]; count: number; next: string | null; previous: string | null }>('/blog/posts/', { params }),
 
   // 获取文章详情
   getPost: (id: number) =>
@@ -24,10 +23,9 @@ export const blogAPI = {
     
     formData.append('title', data.title)
     formData.append('content', data.content)
+    formData.append('excerpt', data.excerpt)
+    formData.append('status', data.status)
     
-    if (data.summary) {
-      formData.append('summary', data.summary)
-    }
     if (data.cover_image) {
       formData.append('cover_image', data.cover_image)
     }
@@ -35,9 +33,6 @@ export const blogAPI = {
       data.tags.forEach(tagId => {
         formData.append('tags', tagId.toString())
       })
-    }
-    if (data.is_published !== undefined) {
-      formData.append('is_published', data.is_published.toString())
     }
 
     return api.post<{ message: string; post: Post }>('/blog/posts/', formData, {
@@ -57,8 +52,8 @@ export const blogAPI = {
     if (data.content) {
       formData.append('content', data.content)
     }
-    if (data.summary) {
-      formData.append('summary', data.summary)
+    if (data.excerpt) {
+      formData.append('excerpt', data.excerpt)
     }
     if (data.cover_image) {
       formData.append('cover_image', data.cover_image)
@@ -68,8 +63,8 @@ export const blogAPI = {
         formData.append('tags', tagId.toString())
       })
     }
-    if (data.is_published !== undefined) {
-      formData.append('is_published', data.is_published.toString())
+    if (data.status) {
+      formData.append('status', data.status)
     }
 
     return api.patch<{ message: string; post: Post }>(`/blog/posts/${id}/`, formData, {

@@ -1,9 +1,10 @@
 import { Outlet } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
+import { AIFloatingWidget } from '@/components/ai/AIFloatingWidget'
 
 export function Layout() {
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-950">
+    <div className="flex h-screen bg-gray-50">
       {/* 左侧边栏 */}
       <Sidebar />
 
@@ -13,6 +14,9 @@ export function Layout() {
           <Outlet />
         </div>
       </main>
+
+      {/* AI 浮窗 */}
+      <AIFloatingWidget />
     </div>
   )
 }
