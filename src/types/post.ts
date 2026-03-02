@@ -9,16 +9,12 @@ export interface Tag {
 export interface Post {
   id: number
   title: string
-  content: string
-  summary: string
+  content?: string  // 列表页可能不返回
+  excerpt: string   // 后端是 excerpt，不是 summary
   cover_image: string | null
-  author: {
-    id: number
-    username: string
-    email: string
-  }
+  author: string    // 后端返回的是用户名字符串，不是对象
   tags: Tag[]
-  is_published: boolean
+  status: 'draft' | 'published' | 'archived'  // 后端是 status，不是 is_published
   view_count: number
   created_at: string
   updated_at: string
@@ -28,20 +24,20 @@ export interface Post {
 export interface CreatePostRequest {
   title: string
   content: string
-  summary?: string
+  excerpt: string
+  status: string
   cover_image?: File
   tags?: number[] // 标签ID数组
-  is_published?: boolean
 }
 
 // 更新文章请求
 export interface UpdatePostRequest {
   title?: string
   content?: string
-  summary?: string
+  excerpt?: string
   cover_image?: File
   tags?: number[]
-  is_published?: boolean
+  status?: string
 }
 
 // 创建标签请求

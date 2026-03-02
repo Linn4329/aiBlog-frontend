@@ -23,7 +23,7 @@ export default function ProfilePage() {
       setProfile(response.data.profile)
     } catch (error) {
       console.error('API 错误:', error)  // 添加这行
-      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message 
+      const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message
         || '获取个人资料失败'
       toast.error(message)
     } finally {

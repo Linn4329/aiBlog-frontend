@@ -42,14 +42,14 @@ export function Sidebar() {
           {/* Logo区域 */}
           <SidebarHeader />
 
-          {/* 导航菜单 */}
-          <SidebarNav />
+          {/* 用户菜单 */}
+          <SidebarFooter />
 
           {/* 搜索框 */}
           <SidebarSearch />
 
-          {/* 用户菜单 */}
-          <SidebarFooter />
+          {/* 功能按钮 */}
+          <SidebarNav />
         </div>
       </aside>
     </>
