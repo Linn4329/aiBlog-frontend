@@ -158,6 +158,8 @@ export default function CreateBlog() {
       localStorage.removeItem('blog_draft')
       
       toast.success(isDraft ? '草稿保存成功' : '文章发布成功')
+      // 触发文章更新事件
+      window.dispatchEvent(new Event('post-updated'))
       navigate(`/blog/${response.data.post.id}`)
     } catch (error) {
       console.error('发布失败:', error)

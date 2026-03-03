@@ -1,14 +1,18 @@
 import { useState } from 'react'
 import { Search } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { Input } from '@/components/ui/input'
 
 export function SidebarSearch() {
   const [query, setQuery] = useState('')
+  const navigate = useNavigate()
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    // TODO: 实现搜索功能（后续对接API）
-    console.log('搜索:', query)
+    if (query.trim()) {
+      navigate(`/blog?search=${encodeURIComponent(query.trim())}`)
+      setQuery('')
+    }
   }
 
   return (

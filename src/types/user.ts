@@ -59,6 +59,7 @@ export interface RegisterResponse {
 // 更新个人资料请求
 export interface UpdateProfileRequest {
   avatar?: File
+  nickname?: string
   bio?: string
   website?: string
   github?: string

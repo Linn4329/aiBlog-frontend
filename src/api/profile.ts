@@ -13,6 +13,9 @@ export const profileAPI = {
     if (data.avatar) {
       formData.append('avatar', data.avatar)
     }
+    if (data.nickname) {
+      formData.append('nickname', data.nickname)
+    }
     if (data.bio) {
       formData.append('bio', data.bio)
     }
@@ -26,10 +29,6 @@ export const profileAPI = {
       formData.append('twitter', data.twitter)
     }
 
-    return api.post<{ message: string; profile: Profile }>('/profiles/', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    })
+    return api.post<{ message: string; profile: Profile }>('/profiles/', formData)
   },
 }

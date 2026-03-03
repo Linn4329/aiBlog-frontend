@@ -148,6 +148,8 @@ export default function EditBlog() {
 
       await blogAPI.updatePost(postId, data)
       toast.success('更新成功')
+      // 触发文章更新事件
+      window.dispatchEvent(new Event('post-updated'))
       navigate(`/blog/${postId}`)
     } catch {
       toast.error('更新失败')

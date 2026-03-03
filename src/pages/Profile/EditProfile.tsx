@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { profileAPI } from '@/api'
-import { User, Upload, X } from 'lucide-react'
+import { Upload, X } from 'lucide-react'
 
 export default function EditProfile() {
   const navigate = useNavigate()
@@ -27,11 +27,19 @@ export default function EditProfile() {
     setLoading(true)
     try {
       const response = await profileAPI.get()
+      console.log('加载资料响应:', response.data)
       setNickname(response.data.profile.nickname || '')
       setBio(response.data.profile.bio || '')
       setWebsite(response.data.profile.website || '')
-      setAvatarPreview(response.data.profile.avatar || null)
-    } catch {
+      // 添加基础URL到头像路径
+      const avatar = response.data.profile.avatar
+      if (avatar && !avatar.startsWith('http')) {
+        setAvatarPreview(`http://localhost:8000${avatar}`)
+      } else {
+        setAvatarPreview(avatar || null)
+      }
+    } catch (error) {
+      console.error('加载资料失败:', error)
       toast.error('获取资料失败')
     } finally {
       setLoading(false)
@@ -49,6 +57,8 @@ export default function EditProfile() {
       }
       reader.readAsDataURL(file)
     }
+    // 重置input的value，允许重复选择同一文件
+    e.target.value = ''
   }
 
   const removeAvatar = () => {
@@ -62,15 +72,21 @@ export default function EditProfile() {
     setSaving(true)
     try {
       const data: Record<string, unknown> = {}
-      if (nickname) data.nickname = nickname
-      if (bio) data.bio = bio
-      if (website) data.website = website
+      // 总是提交这些字段，包括空字符串
+      data.nickname = nickname
+      data.bio = bio
+      data.website = website
       if (avatar) data.avatar = avatar
 
-      await profileAPI.update(data)
+      console.log('提交的数据:', data)
+      const response = await profileAPI.update(data)
+      console.log('更新响应:', response.data)
       toast.success('更新成功')
+      // 触发自定义事件，通知其他组件更新
+      window.dispatchEvent(new Event('profile-updated'))
       navigate('/profile')
-    } catch {
+    } catch (error) {
+      console.error('更新失败:', error)
       toast.error('更新失败')
     } finally {
       setSaving(false)
@@ -108,7 +124,7 @@ export default function EditProfile() {
             </div>
           ) : (
             <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center">
-              <User className="h-12 w-12 text-gray-400" />
+              <span className="text-3xl font-bold text-gray-400">U</span>
             </div>
           )}
           <div>

@@ -92,7 +92,7 @@ export function AIFloatingWidget() {
         )}
       </button>
 
-      <AIChatWindow isOpen={isOpen} onClose={() => setIsOpen(false)} />
+      <AIChatWindow isOpen={isOpen} onClose={() => setIsOpen(false)} iconPosition={position} />
     </>
   )
 }

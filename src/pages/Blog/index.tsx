@@ -176,7 +176,7 @@ export default function BlogList() {
               {post.cover_image && (
                 <div className="aspect-video bg-gray-100 dark:bg-gray-800">
                   <img
-                    src={post.cover_image}
+                    src={post.cover_image.startsWith('http') ? post.cover_image : `http://localhost:8000${post.cover_image}`}
                     alt={post.title}
                     className="w-full h-full object-cover"
                   />

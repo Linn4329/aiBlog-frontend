@@ -13,6 +13,7 @@ export interface Post {
   excerpt: string   // 后端是 excerpt，不是 summary
   cover_image: string | null
   author: string    // 后端返回的是用户名字符串，不是对象
+  author_id?: number // 作者ID
   tags: Tag[]
   status: 'draft' | 'published' | 'archived'  // 后端是 status，不是 is_published
   view_count: number

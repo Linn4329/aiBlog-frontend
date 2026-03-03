@@ -2,8 +2,10 @@
 export interface ChatMessage {
   id: number
   session: number
-  role: 'user' | 'assistant'
+  role: 'user' | 'assistant' | 'system'
   content: string
+  prompt_tokens?: number
+  completion_tokens?: number
   created_at: string
 }
 
@@ -12,8 +14,25 @@ export interface ChatSession {
   id: number
   user: number
   title: string
+  session_type: 'consult' | 'summary'
   created_at: string
   updated_at: string
+  messages?: ChatMessage[]
+}
+
+// 会话列表项（包含最后一条消息和消息数量）
+export interface ChatSessionListItem {
+  id: number
+  title: string
+  session_type: 'consult' | 'summary'
+  created_at: string
+  updated_at: string
+  last_message?: {
+    content: string
+    role: string
+    created_at: string
+  }
+  message_count: number
 }
 
 // 发送消息请求
@@ -29,6 +48,7 @@ export interface SSEMessage {
   text?: string
   has_error?: boolean
   error?: string
+  error_type?: 'timeout' | 'api_error'
 }
 
 // 生成摘要请求

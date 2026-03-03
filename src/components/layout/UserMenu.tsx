@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import { User, Settings, LogOut } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
@@ -11,9 +12,44 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { ThemeToggle } from './ThemeToggle'
 import { useAuth } from '@/context/AuthContext'
+import { profileAPI } from '@/api'
+import type { Profile } from '@/types'
 
 export function UserMenu() {
   const { user, isAuthenticated, logout } = useAuth()
+  const [profile, setProfile] = useState<Profile | null>(null)
+
+  // 加载用户资料
+  const loadProfile = async () => {
+    if (isAuthenticated) {
+      try {
+        const response = await profileAPI.get()
+        const profile = response.data.profile
+        // 添加基础URL到头像路径
+        if (profile.avatar && !profile.avatar.startsWith('http')) {
+          profile.avatar = `http://localhost:8000${profile.avatar}`
+        }
+        setProfile(profile)
+      } catch (error) {
+        console.error('加载用户资料失败:', error)
+      }
+    }
+  }
+
+  useEffect(() => {
+    loadProfile()
+  }, [isAuthenticated])
+
+  // 监听profile更新事件
+  useEffect(() => {
+    const handleProfileUpdate = () => {
+      loadProfile()
+    }
+    window.addEventListener('profile-updated', handleProfileUpdate)
+    return () => {
+      window.removeEventListener('profile-updated', handleProfileUpdate)
+    }
+  }, [])
 
   if (!isAuthenticated) {
     return (
@@ -32,10 +68,10 @@ export function UserMenu() {
       <DropdownMenuTrigger asChild>
         <button className="flex items-center gap-3 w-full px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors">
           <Avatar className="h-8 w-8">
-            <AvatarImage src={user?.avatar} alt={user?.username} />
-            <AvatarFallback>{user?.username?.[0]?.toUpperCase() || 'U'}</AvatarFallback>
+            <AvatarImage src={profile?.avatar || user?.avatar} alt={profile?.nickname || user?.username} />
+            <AvatarFallback>{(profile?.nickname || user?.username)?.[0]?.toUpperCase() || 'U'}</AvatarFallback>
           </Avatar>
-          <span className="font-medium text-gray-700 dark:text-gray-300">{user?.username}</span>
+          <span className="font-medium text-gray-700 dark:text-gray-300">{profile?.nickname || user?.username}</span>
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">

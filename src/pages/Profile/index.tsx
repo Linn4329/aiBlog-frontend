@@ -1,26 +1,69 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { User, Mail, Calendar, Globe, Github, Twitter } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { profileAPI } from '@/api'
+import { profileAPI, blogAPI } from '@/api'
 import { useAuth } from '@/context/AuthContext'
 import type { Profile } from '@/types'
 
 export default function ProfilePage() {
   const { user } = useAuth()
+  const navigate = useNavigate()
   const [profile, setProfile] = useState<Profile | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [postCount, setPostCount] = useState(0)
+  const [totalViews, setTotalViews] = useState(0)
 
   useEffect(() => {
     fetchProfile()
+    fetchUserStats()
+  }, [])
+
+  // 监听profile更新事件
+  useEffect(() => {
+    const handleProfileUpdate = () => {
+      fetchProfile()
+    }
+    window.addEventListener('profile-updated', handleProfileUpdate)
+    return () => {
+      window.removeEventListener('profile-updated', handleProfileUpdate)
+    }
+  }, [])
+
+  // 监听文章更新事件
+  useEffect(() => {
+    const handlePostUpdate = () => {
+      fetchUserStats()
+    }
+    window.addEventListener('post-updated', handlePostUpdate)
+    return () => {
+      window.removeEventListener('post-updated', handlePostUpdate)
+    }
+  }, [])
+
+  // 监听profile更新事件
+  useEffect(() => {
+    const handleProfileUpdate = () => {
+      fetchProfile()
+    }
+    window.addEventListener('profile-updated', handleProfileUpdate)
+    return () => {
+      window.removeEventListener('profile-updated', handleProfileUpdate)
+    }
   }, [])
 
   const fetchProfile = async () => {
     try {
       const response = await profileAPI.get()
       console.log('API 响应:', response.data)  // 添加这行
-      setProfile(response.data.profile)
+      const profile = response.data.profile
+      // 添加基础URL到头像路径
+      if (profile.avatar && !profile.avatar.startsWith('http')) {
+        profile.avatar = `http://localhost:8000${profile.avatar}`
+      }
+      setProfile(profile)
     } catch (error) {
       console.error('API 错误:', error)  // 添加这行
       const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message
@@ -28,6 +71,21 @@ export default function ProfilePage() {
       toast.error(message)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const fetchUserStats = async () => {
+    try {
+      const response = await blogAPI.getPosts({ page: 1 })
+      const posts = response.data.posts || []
+      // 过滤出当前用户的文章
+      const userPosts = posts.filter(post => post.author_id === user?.id || post.author === user?.username)
+      setPostCount(userPosts.length)
+      // 计算总浏览量
+      const views = userPosts.reduce((sum, post) => sum + post.view_count, 0)
+      setTotalViews(views)
+    } catch (error) {
+      console.error('获取统计信息失败:', error)
     }
   }
 
@@ -66,7 +124,7 @@ export default function ProfilePage() {
           {/* 基本信息 */}
           <div className="flex-1 space-y-4">
             <div>
-              <h1 className="text-2xl font-bold">{profile.username}</h1>
+              <h1 className="text-2xl font-bold">{profile.nickname || profile.username}</h1>
               <p className="text-gray-600 dark:text-gray-400 mt-1">
                 {profile.bio || '这个人很懒，什么都没写...'}
               </p>
@@ -132,21 +190,21 @@ export default function ProfilePage() {
 
           {/* 编辑按钮（如果是自己的主页） */}
           {user && user.username === profile.username && (
-            <Button variant="outline">
+            <Button variant="outline" onClick={() => navigate('/profile/edit')}>
               编辑资料
             </Button>
           )}
         </div>
       </div>
 
-      {/* 统计信息（可选，后续扩展） */}
+      {/* 统计信息 */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-6 text-center">
-          <div className="text-3xl font-bold text-blue-600">0</div>
+          <div className="text-3xl font-bold text-blue-600">{postCount}</div>
           <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">文章数</div>
         </div>
         <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-6 text-center">
-          <div className="text-3xl font-bold text-green-600">0</div>
+          <div className="text-3xl font-bold text-green-600">{totalViews}</div>
           <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">浏览量</div>
         </div>
         <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-6 text-center">

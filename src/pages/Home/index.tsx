@@ -99,7 +99,7 @@ export default function Home() {
               className="bg-white rounded-lg overflow-hidden hover:shadow-lg transition"
             >
               {post.cover_image && (
-                <img src={post.cover_image} alt="" className="w-full h-40 object-cover" />
+                <img src={post.cover_image.startsWith('http') ? post.cover_image : `http://localhost:8000${post.cover_image}`} alt="" className="w-full h-40 object-cover" />
               )}
               <div className="p-4">
                 <h3 className="font-medium mb-2 line-clamp-2">{post.title}</h3>
