@@ -15,6 +15,7 @@ const Profile = lazy(() => import('@/pages/Profile'))
 const EditProfile = lazy(() => import('@/pages/Profile/EditProfile'))
 const Login = lazy(() => import('@/pages/Auth/Login'))
 const Register = lazy(() => import('@/pages/Auth/Register'))
+const EditBlog = lazy(() => import('@/pages/Blog/EditBlog'))
 
 // 路由配置
 export const router = createBrowserRouter([
@@ -98,6 +99,14 @@ export const router = createBrowserRouter([
               <Suspense fallback={<PageLoader />}>
                 <EditProfile />
               </Suspense>
+            ),
+          },
+          {
+            path: 'blog/:id/edit',
+            element: (
+            <Suspense fallback={<PageLoader />}>
+            <EditBlog />
+            </Suspense>
             ),
           },
         ],

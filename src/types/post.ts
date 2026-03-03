@@ -44,3 +44,20 @@ export interface UpdatePostRequest {
 export interface CreateTagRequest {
   name: string
 }
+
+// 文章查询参数
+export interface PostQueryParams {
+  search?: string
+  tag?: string
+  page?: number
+}
+
+// 更新文章请求
+export interface UpdatePostRequest {
+  title?: string
+  content?: string
+  excerpt?: string
+  cover_image?: File
+  tags?: number[]
+  status?: string
+}

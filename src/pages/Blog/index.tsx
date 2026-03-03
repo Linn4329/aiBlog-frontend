@@ -1,26 +1,36 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import { Calendar, User, Eye, Tag } from 'lucide-react'
+import { Calendar, User, Eye, Tag, Search, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { blogAPI } from '@/api'
 import type { Post, Tag as TagType } from '@/types'
 
 export default function BlogList() {
+  const [searchParams, setSearchParams] = useSearchParams()
   const [posts, setPosts] = useState<Post[]>([])
   const [tags, setTags] = useState<TagType[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+
+  // 从 URL 获取搜索参数
+  const urlSearch = searchParams.get('search') || ''
+  const urlTag = searchParams.get('tag') || ''
 
   useEffect(() => {
     fetchTags()
+    // 设置 URL 参数到状态
+    if (urlSearch) setSearchQuery(urlSearch)
+    if (urlTag) setSelectedTag(urlTag)
   }, [])
 
   useEffect(() => {
     fetchPosts()
-  }, [currentPage, selectedTag])
+  }, [currentPage, selectedTag, urlSearch])
 
   const fetchTags = async () => {
     try {
@@ -38,14 +48,14 @@ export default function BlogList() {
       if (selectedTag) {
         params.tag = selectedTag
       }
+      if (urlSearch) {
+        params.search = urlSearch
+      }
 
       const response = await blogAPI.getPosts(params)
       const data = response.data
       
-      // 后端返回的是 posts 字段，不是 results
       setPosts(data.posts || [])
-      
-      // 计算总页数
       setTotalPages(Math.ceil((data.count || 0) / 10))
     } catch (error) {
       const message = (error as { response?: { data?: { message?: string } } })?.response?.data?.message 
@@ -56,11 +66,32 @@ export default function BlogList() {
     }
   }
 
-  const handleTagClick = (tagName: string) => {
-    if (selectedTag === tagName) {
-      setSelectedTag(null)
+  // 搜索
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      setSearchParams({ search: searchQuery.trim() })
     } else {
-      setSelectedTag(tagName)
+      setSearchParams({})
+    }
+    setCurrentPage(1)
+  }
+
+  // 清除搜索
+  const clearSearch = () => {
+    setSearchQuery('')
+    setSearchParams({})
+    setCurrentPage(1)
+  }
+
+  const handleTagClick = (tagId: string) => {
+    if (selectedTag === tagId) {
+      setSelectedTag(null)
+      searchParams.delete('tag')
+      setSearchParams(searchParams)
+    } else {
+      setSelectedTag(tagId)
+      searchParams.set('tag', tagId)
+      setSearchParams(searchParams)
     }
     setCurrentPage(1)
   }
@@ -83,16 +114,43 @@ export default function BlogList() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
+      {/* 搜索框 */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+        <div className="flex gap-2">
+          <Input
+            placeholder="搜索文章..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+          />
+          <Button onClick={handleSearch}>
+            <Search className="h-4 w-4 mr-2" />
+            搜索
+          </Button>
+          {urlSearch && (
+            <Button variant="outline" onClick={clearSearch}>
+              <X className="h-4 w-4 mr-2" />
+              清除
+            </Button>
+          )}
+        </div>
+        {urlSearch && (
+          <p className="mt-2 text-sm text-gray-500">
+            搜索结果："{urlSearch}" - 共 {posts.length} 篇文章
+          </p>
+        )}
+      </div>
+
       {/* 标签筛选 */}
-      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 p-6">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <h2 className="text-lg font-semibold mb-4">标签筛选</h2>
         <div className="flex flex-wrap gap-2">
           {tags.map((tag) => (
             <Button
               key={tag.id}
-              variant={selectedTag === tag.name ? 'default' : 'outline'}
+              variant={selectedTag === String(tag.id) ? 'default' : 'outline'}
               size="sm"
-              onClick={() => handleTagClick(tag.name)}
+              onClick={() => handleTagClick(String(tag.id))}
             >
               <Tag className="h-4 w-4 mr-1" />
               {tag.name}
