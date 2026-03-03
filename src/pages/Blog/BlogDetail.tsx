@@ -114,15 +114,19 @@ export default function BlogDetail() {
 
           {/* 摘要 */}
           {post.excerpt && (
-            <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border-l-4 border-blue-600">
-              <p className="text-gray-700 dark:text-gray-300 italic">{post.excerpt}</p>
+            <div className="mb-8 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border-l-4 border-blue-600">
+              <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 font-medium">摘要</p>
+              <p className="text-gray-700 dark:text-gray-300">{post.excerpt}</p>
             </div>
           )}
 
           {/* 正文 */}
-          <div className="prose dark:prose-invert max-w-none">
+          <div className="prose dark:prose-invert max-w-none mt-8">
             {post.content ? (
-              <div className="whitespace-pre-wrap">{post.content}</div>
+              <div 
+                className="html-content"
+                dangerouslySetInnerHTML={{ __html: post.content }}
+              />
             ) : (
               <p className="text-gray-500 dark:text-gray-400">暂无内容</p>
             )}
